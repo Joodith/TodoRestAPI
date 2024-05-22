@@ -1,45 +1,33 @@
+import axios from "axios";
 import TodoShow from "./TodoShow";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import {
+  render,
+  fireEvent,
+  screen,
+  waitFor,
+  getByTestId,
+  getByText,
+} from "@testing-library/react";
 
-describe("Display page containing todos list", () => {
-  test("should delete striked todos when DELETE button is clicked", async () => {
-    const defaultItems = [
-      "Read SpringBoot",
-      "Complete assignments",
-      "Prepare breakfast",
-      "Sleep for 2 hours",
-      "Take a shower",
-    ];
-
+jest.mock("axios");
+describe("<TodoShow />", () => {
+  it("get todos through get axios request", async () => {
+    const mockResponse = {
+      data: [
+        { id: 1, todo: "Learning React", completed: false },
+        { id: 2, todo: "Workout", completed: false },
+      ],
+    };
+    axios.get.mockResolvedValueOnce(mockResponse);
     render(<TodoShow />);
-
-    async function clickDelete() {
-      const emptyButton = screen.getByTestId("delete_button");
-      userEvent.click(emptyButton);
-    }
-    const todoListItems = document.querySelectorAll("li");
-    expect(todoListItems.length).toBe(defaultItems.length);
-    strikeFirstTwoTodos();
-    await clickDelete();
-    const itemsLength = document.querySelectorAll("li").length;
-    expect(itemsLength).toBe(defaultItems.length - 2);
-
-    function strikeFirstTwoTodos() {
-      userEvent.click(todoListItems[0]);
-      userEvent.click(todoListItems[1]);
-    }
-  });
-
-  test("should strike an item when clicked", async () => {
-    render(<TodoShow />);
-    const todoItem = document.querySelectorAll("li");
-    if (todoItem.length > 0) {
-      expect(todoItem[0]).toHaveClass("todoItem");
-      userEvent.click(todoItem[0]);
-      expect(todoItem[0]).toHaveClass("todoItemStrike");
-      userEvent.click(todoItem[0]);
-      expect(todoItem[0]).toHaveClass("todoItem");
-    }
+    await checkIfFetchingAllTodosIsSuccess();
   });
 });
+async function checkIfFetchingAllTodosIsSuccess() {
+  const todoItemOne = await waitFor(() => screen.getByText("Learning React"));
+  expect(todoItemOne).toBeVisible();
+  const todoItemTwo = await waitFor(() => screen.getByText("Workout"));
+  expect(todoItemTwo).toBeVisible();
+  await waitFor(() => expect(axios.get).toHaveBeenCalledTimes(1));
+  await waitFor(() => expect(axios.get).toHaveBeenCalledWith("/"));
+}

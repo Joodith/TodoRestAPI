@@ -8,4 +8,13 @@ describe("Diplay todos", () => {
     const defaultMessage = screen.queryByText("Nothing to do buddy. Sleep!!");
     expect(defaultMessage).toBeVisible();
   });
+  test("should display all todos ", () => {
+    const items = [
+      { id: 1, todo: "Learning React", completed: false },
+      { id: 2, todo: "Workout", completed: false },
+    ];
+    render(<TodoList todoItems={items} />);
+    const displayTodoItems = document.querySelectorAll("li");
+    expect(displayTodoItems.length).toEqual(2);
+  });
 });

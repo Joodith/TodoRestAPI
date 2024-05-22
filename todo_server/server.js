@@ -27,8 +27,6 @@ app.get("/api/todos", async (req, res) => {
 
 app.get("/api/todos/:id", async (req, res) => {
   const id = parseInt(req.params.id);
-  console.log(req.params.id);
-  console.log(id);
   let todoJSON = await readJson();
   let allTodos = todoJSON.allTodos;
   const currentTodo = allTodos.find((item) => item.id === id);
@@ -62,6 +60,7 @@ app.put("/api/todos/:id", async (req, res) => {
   let currentTodo = null;
   allTodos.forEach((element) => {
     if (element.id === id) {
+      element.id = id;
       element.todo = todo;
       element.completed = completed;
       currentTodo = element;
@@ -86,10 +85,16 @@ app.delete("/api/todos/:id", async (req, res) => {
   let allTodos = todoJSON.allTodos;
   const newTodos = allTodos.filter((item) => item.id !== id);
   const newJsonData = JSON.stringify({ allTodos: newTodos });
+  const resp = {};
   try {
     fs.writeFileSync("todos.json", newJsonData);
-    res.sendStatus(204);
+    resp["status"] = 204;
+    resp["message"] = "Deleted successfully";
+    res.status(204).json(resp);
   } catch (error) {
+    resp["status"] = 500;
+    resp["message"] = error.message;
+    res.status(404).json(resp);
     console.error(error);
   }
 });

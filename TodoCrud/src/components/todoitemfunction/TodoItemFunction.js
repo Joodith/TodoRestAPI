@@ -14,11 +14,9 @@ export default function TodoItemFunction() {
   const [message, setMessage] = useState("");
   const actionDone = message.length > 0 ? true : false;
   function getTodoById(id) {
-    console.log("id is " + id);
     todoServices
       .getTodo(id)
       .then((response) => {
-        console.log(response.data);
         setCurrentTodo(response.data);
       })
       .catch((e) => {
@@ -38,10 +36,12 @@ export default function TodoItemFunction() {
       .updateTodo(currentTodo.id, data)
       .then((response) => {
         setCurrentTodo(response.data);
+        console.log(response.data);
         setMessage("Todo updated successfully");
       })
       .catch((e) => {
         console.log(e);
+        setMessage("Failed to update todo");
       });
   }
   function deleteTodo() {

@@ -22,7 +22,6 @@ export default function TodoCreateForm() {
     todoServices
       .addTodo(data)
       .then((response) => {
-        console.log(response);
         const addedTodo = {
           id: response.data.id,
           todo: response.data.todo,
@@ -43,7 +42,7 @@ export default function TodoCreateForm() {
     <div>
       {submitted ? (
         <div>
-          <h4>Todo added successfully!</h4>
+          <h4 data-testid="greeting">Todo added successfully!</h4>
           <a href="/todos">
             <button>BACK TO HOME</button>
           </a>
